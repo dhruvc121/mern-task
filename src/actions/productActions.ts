@@ -12,10 +12,9 @@ import { cache } from "react";
 
 export async function getProducts(pageNo:number,pageSize:number,searchParams:any) {
   try {
-    /* pageNo=pageNo?pageNo:1
-    pageSize=pageSize?pageSize:DEFAULT_PAGE_SIZE */
-    const {sortBy,brandId,categoryId,priceRangeTo,gender,occasion,discount}=searchParams
-    //console.log(pageNo,pageSize)
+    
+    const {sortBy,brandId,categoryId,priceRangeTo,gender,occasions,discount}=searchParams
+    
     let products;
     
     let dbQuery = db.selectFrom("products").selectAll("products")
@@ -35,8 +34,9 @@ export async function getProducts(pageNo:number,pageSize:number,searchParams:any
     if(gender){
       dbQuery=dbQuery.where('gender',"=",gender)
     }
-    if(occasion){
-      dbQuery=dbQuery.where('occasion',"like",occasion)
+    if(occasions){
+  
+      dbQuery=dbQuery.where('occasion',"like",occasions)
     }
     if(discount){
       let discPart=discount.split('-')
@@ -54,7 +54,7 @@ export async function getProducts(pageNo:number,pageSize:number,searchParams:any
        
     
     const lastPage = Math.ceil(count / pageSize);
-    //console.log("last apge",lastPage,pageSize)
+    
     const numOfResultsOnCurPage = products.length;
     
     return { products, count, lastPage, numOfResultsOnCurPage };
@@ -64,7 +64,7 @@ export async function getProducts(pageNo:number,pageSize:number,searchParams:any
 }
 
 export const getProduct = cache(async function getProduct(productId: number) {
-  // console.log("run");
+  
   try {
     const product = await db
       .selectFrom("products")
@@ -188,7 +188,7 @@ function getOccasions(occasions:string[]){
   occasions.map((occasion)=>{
     arr=arr.length?arr+","+occasion.value:arr+occasion.value
   })
-  console.log(arr,"occasions")
+  
   return arr
 }
 export async function addProduct(product:InsertProducts) {
@@ -213,7 +213,7 @@ export async function addProduct(product:InsertProducts) {
         ,price
       })
       .execute();
-      console.log(res[0].insertId)
+      
         for (const row of product.categories) {
         await db.insertInto("product_categories")
           .values({
@@ -238,13 +238,6 @@ export async function editProduct(product:InsertProducts,id:number) {
     delete productObj.categories
     productObj=productObj.image_url==""?delete productObj.image_url:productObj
     
-    /* console.log({
-      ...productObj,  
-      brands:JSON.stringify(brands),
-      occasion,
-      price
-    },"product obj",categories)
-     */
     //delete product categories in product_categories
     await db.deleteFrom("product_categories").where("product_id","=",id).execute()
 

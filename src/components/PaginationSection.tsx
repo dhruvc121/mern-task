@@ -15,7 +15,7 @@ function PaginationSection({
 
   const query = useSearchParams();
   const searchParams = new URLSearchParams(query);
-  console.log(pageNo,pageSize,lastPage,"pagination page")
+  
   function handlePrev() {
     pageNo--;
     searchParams.set("page",pageNo.toString())

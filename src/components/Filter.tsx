@@ -132,7 +132,7 @@ function Filter({ categories, brands }) {
   }
 
   function handleCategoriesSelected(e) {
-    console.log("category",e)
+    
     setCategoriesSelected(e)
     const categories = e.length ? e.map(category => category.value) : [];
     searchParams.set('categoryId', categories.join(','));
@@ -142,7 +142,7 @@ function Filter({ categories, brands }) {
   function handleSlider(e) {
     setSliderChanged(true)
     setSliderValue(e.target.value)
-    console.log(e)
+    
   }
 
   const handleGenderChange = (e) => {
@@ -152,15 +152,14 @@ function Filter({ categories, brands }) {
   };
 
   function handleOccasions(e) {
-    //console.log("category",e)
-    //setOcc(e)
+    
     const occasion = e.length ? e.map(occasion => occasion.value) : [];
     searchParams.set('occasions', occasion.join(','));
     router.push(`/products?${searchParams.toString()}`);
   }
 
   function handleDiscount(e) {
-    //console.log(e)
+    
     searchParams.set('discount',e.value)
     router.push(`/products?${searchParams.toString()}`)
   }

@@ -45,7 +45,7 @@ function AddProduct() {
 
     onSubmit: async (values: any, actions) => {
       try{
-        console.log(values)
+        
         await addProduct(values)
         toast.success("Product added Successfully")
         resetForm()

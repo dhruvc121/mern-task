@@ -15,13 +15,17 @@ function PaginationSection({
 
   const query = useSearchParams();
   const searchParams = new URLSearchParams(query);
-
+  console.log(pageNo,pageSize,lastPage,"pagination page")
   function handlePrev() {
-    alert("Please update the code.");
+    pageNo--;
+    searchParams.set("page",pageNo.toString())
+    router.push(`/products?${searchParams.toString()}`)
   }
 
   function handleNext() {
-    alert("Please update the code.");
+    pageNo++;
+    searchParams.set("page",pageNo.toString())
+    router.push(`/products?${searchParams.toString()}`)
   }
 
   return (
@@ -32,7 +36,9 @@ function PaginationSection({
         className="text-black"
         onChange={(e) => {
           searchParams.set("pageSize",e.target.value)
-          router.push('/products')
+          //console.log(e.target.value,searchParams.get("pageSize"),"--------")
+          //alert("ehre")
+          router.push(`/products?${searchParams.toString()}`)
         }}
       >
         {["10", "25", "50"].map((val) => {

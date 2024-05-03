@@ -10,10 +10,12 @@ import { authOptions } from "@/utils/authOptions";
 import { cache } from "react";
 
 
-export async function getProducts(pageNo = 1, pageSize = DEFAULT_PAGE_SIZE,searchParams:any) {
+export async function getProducts(pageNo:number,pageSize:number,searchParams:any) {
   try {
+    /* pageNo=pageNo?pageNo:1
+    pageSize=pageSize?pageSize:DEFAULT_PAGE_SIZE */
     const {sortBy,brandId,categoryId,priceRangeTo,gender,occasion,discount}=searchParams
-    console.log(searchParams,"+========")
+    //console.log(pageNo,pageSize)
     let products;
     
     let dbQuery = db.selectFrom("products").selectAll("products")
@@ -40,18 +42,19 @@ export async function getProducts(pageNo = 1, pageSize = DEFAULT_PAGE_SIZE,searc
       let discPart=discount.split('-')
       dbQuery=dbQuery.where('discount',">=",discPart[0])
       dbQuery=dbQuery.where('discount',"<=",discPart[1])
-    }     
+    }  
+    
     products = await dbQuery
        .distinct()
        .offset((pageNo - 1) * pageSize)
        .limit(pageSize)
        .execute();
 
-    const {count} = await dbQuery
-      .executeTakeFirst();
-      
-      
+    const {count} = await db.selectFrom("products").select(db.fn.count("products.id").as("count")).executeTakeFirst()
+       
+    
     const lastPage = Math.ceil(count / pageSize);
+    //console.log("last apge",lastPage,pageSize)
     const numOfResultsOnCurPage = products.length;
     
     return { products, count, lastPage, numOfResultsOnCurPage };

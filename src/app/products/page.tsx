@@ -13,14 +13,15 @@ export default async function Products({
 }: {
   searchParams?: { [key: string]: string | string[] | undefined };
 }) {
-  const { page = 1, pageSize = DEFAULT_PAGE_SIZE } = searchParams as any;
+  
+  const { page=1, pageSize=DEFAULT_PAGE_SIZE} = searchParams as any;
   
   const { products, lastPage, numOfResultsOnCurPage } = await getProducts(
     +page,
     +pageSize,
     searchParams
   );
-
+  console.log( lastPage, numOfResultsOnCurPage )  
   const brands = await getBrands();
   const categories = await getCategories();
 
@@ -46,8 +47,8 @@ export default async function Products({
       {products.length > 0 && (
         <PaginationSection
           lastPage={lastPage}
-          pageNo={+page}
-          pageSize={+pageSize}
+          pageNo={parseInt(page)}
+          pageSize={parseInt(pageSize)}
         />
       )}
     </div>

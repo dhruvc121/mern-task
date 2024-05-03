@@ -4,7 +4,7 @@ This is a Product management app. User can Add products, View all the available 
 
 ## Github Repo:
 
-https://github.com/dhruvc121/mern-stack-task
+https://github.com/dhruvc121/mern-task
 
 ### Setting Up the Project
 

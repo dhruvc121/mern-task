@@ -7,6 +7,7 @@ import { getCategories } from "@/actions/categoryActions";
 import { getBrands } from "@/actions/brandActions";
 import {
   MapBrandIdsToName,
+  editProduct,
   getProduct,
   getProductCategories,
   updateProduct,
@@ -19,6 +20,7 @@ import { occasionOptions } from "../../../../../constant";
 import { notFound, useRouter } from "next/navigation";
 import { UpdateProducts } from "@/types";
 import { toast } from "react-toastify";
+import { useQueryParams } from "@/hooks/useQueryParams";
 
 function EditProduct({ params }: { params: { id: string } }) {
   const { id } = params;
@@ -33,7 +35,7 @@ function EditProduct({ params }: { params: { id: string } }) {
   const [categoriesOption, setCategoriesOption] = useState([]);
   const [initialValues, setInitialValues] = useState({});
   const [error, setError] = useState(false);
-
+  const searchParams = useQueryParams();
   const router = useRouter();
   const {
     values: product,
@@ -61,7 +63,15 @@ function EditProduct({ params }: { params: { id: string } }) {
     validationSchema: basicSchema,
 
     onSubmit: async (values, actions) => {
-      alert("Please update the code.");
+      try{
+        await editProduct(values,+id)
+        toast.success("Product updated successfully")
+      }catch(err){
+        toast.error("Product Update failed")
+        throw err
+      }finally{
+        router.push(`/products?${searchParams.toString()}`)
+      }
     },
   });
 
@@ -129,8 +139,9 @@ function EditProduct({ params }: { params: { id: string } }) {
         gender: productArr.gender,
         occasion: initialOccasion,
         rating: +productArr.rating,
-        image_url: "",
+        image_url: productArr.image_url,
       };
+      console.log(productArr)
       setValues(product);
       setInitialValues(product);
       setLoading(false);

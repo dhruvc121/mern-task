@@ -1,5 +1,6 @@
 "use client";
 
+import { revalidatePath } from "next/cache";
 import { useRouter, useSearchParams } from "next/navigation";
 
 const sortingOptions = [
@@ -15,7 +16,6 @@ function SortBy() {
   const router = useRouter();
   const params = useSearchParams();
   const searchParams = new URLSearchParams(params);
-
   return (
     <div className="text-black flex gap-2">
       <p className="text-white text-lg">Sort By</p>
@@ -24,7 +24,8 @@ function SortBy() {
         id="sorting"
         value={String(searchParams.get("sortBy"))}
         onChange={(e) => {
-          alert("Please update the code.");
+          searchParams.set('sortBy',e.target.value)
+          router.push(`/products?${searchParams.toString()}`)
         }}
       >
         <option value="">None</option>

@@ -22,7 +22,7 @@ const discountOptions = [
 function Filter({ categories, brands }) {
   const searchParams = useQueryParams();
   const router = useRouter();
-
+  
   const brandsOption: any[] = useMemo(() => {
     return brands.map((brand: any) => ({
       value: brand.id,
@@ -125,28 +125,44 @@ function Filter({ categories, brands }) {
     }
   }, [sliderValue]);
 
-  function handleBrandsSelect(e) {
-    alert("Please update the code.");
+  function handleBrandsSelect(e) {    
+    const brandIds = e.length ? e.map(brand => brand.value) : [];
+    searchParams.set('brandId', brandIds.join(','));
+    router.push(`/products?${searchParams.toString()}`);    
   }
 
   function handleCategoriesSelected(e) {
-    alert("Please update the code.");
+    console.log("category",e)
+    setCategoriesSelected(e)
+    const categories = e.length ? e.map(category => category.value) : [];
+    searchParams.set('categoryId', categories.join(','));
+    router.push(`/products?${searchParams.toString()}`); 
   }
 
   function handleSlider(e) {
-    alert("Please update the code.");
+    setSliderChanged(true)
+    setSliderValue(e.target.value)
+    console.log(e)
   }
 
   const handleGenderChange = (e) => {
-    alert("Please update the code.");
+    searchParams.set('gender',e.target.value)
+    setSelectedGender(e.target.value)
+    router.push(`/products?${searchParams.toString()}`)
   };
 
   function handleOccasions(e) {
-    alert("Please update the code.");
+    //console.log("category",e)
+    //setOcc(e)
+    const occasion = e.length ? e.map(occasion => occasion.value) : [];
+    searchParams.set('occasions', occasion.join(','));
+    router.push(`/products?${searchParams.toString()}`);
   }
 
   function handleDiscount(e) {
-    alert("Please update the code.");
+    //console.log(e)
+    searchParams.set('discount',e.value)
+    router.push(`/products?${searchParams.toString()}`)
   }
 
   // function handleClearAll() {
@@ -158,7 +174,6 @@ function Filter({ categories, brands }) {
   //   searchParams.delete("discount");
   //   router.push(`/products?${searchParams.toString()}`);
   // }
-
   return (
     <div className="w-full">
       {/* <button className="bg-white p-2 my-4 text-black" onClick={handleClearAll}>

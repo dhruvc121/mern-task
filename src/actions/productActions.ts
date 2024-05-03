@@ -9,25 +9,51 @@ import { revalidatePath } from "next/cache";
 import { authOptions } from "@/utils/authOptions";
 import { cache } from "react";
 
-export async function getProducts(pageNo = 1, pageSize = DEFAULT_PAGE_SIZE) {
+
+export async function getProducts(pageNo = 1, pageSize = DEFAULT_PAGE_SIZE,searchParams:any) {
   try {
+    const {sortBy,brandId,categoryId,priceRangeTo,gender,occasion,discount}=searchParams
+    console.log(searchParams,"+========")
     let products;
-    let dbQuery = db.selectFrom("products").selectAll("products");
-
-    const { count } = await dbQuery
-      // .select(sql`COUNT(DISTINCT products.id) as count`)
-      .executeTakeFirst();
-
-    const lastPage = Math.ceil(count / pageSize);
-
+    
+    let dbQuery = db.selectFrom("products").selectAll("products")
+    if(sortBy){
+      const sort = sortBy?.split('-');
+      dbQuery=dbQuery.orderBy(sort[0], sort[1]=="asc"?"asc":"desc")
+    } 
+    if(brandId){
+      dbQuery=dbQuery
+    }
+    if(categoryId){
+      dbQuery=dbQuery
+    }
+    if(priceRangeTo){
+      dbQuery=dbQuery.where('price',"<=",priceRangeTo)
+    }
+    if(gender){
+      dbQuery=dbQuery.where('gender',"=",gender)
+    }
+    if(occasion){
+      dbQuery=dbQuery.where('occasion',"like",occasion)
+    }
+    if(discount){
+      let discPart=discount.split('-')
+      dbQuery=dbQuery.where('discount',">=",discPart[0])
+      dbQuery=dbQuery.where('discount',"<=",discPart[1])
+    }     
     products = await dbQuery
-      .distinct()
-      .offset((pageNo - 1) * pageSize)
-      .limit(pageSize)
-      .execute();
+       .distinct()
+       .offset((pageNo - 1) * pageSize)
+       .limit(pageSize)
+       .execute();
 
+    const {count} = await dbQuery
+      .executeTakeFirst();
+      
+      
+    const lastPage = Math.ceil(count / pageSize);
     const numOfResultsOnCurPage = products.length;
-
+    
     return { products, count, lastPage, numOfResultsOnCurPage };
   } catch (error) {
     throw error;
@@ -143,5 +169,104 @@ export async function getProductCategories(productId: number) {
     return categories;
   } catch (error) {
     throw error;
+  }
+}
+
+function getBrandIds(brands:string[]){
+  let arr=[]
+  brands.map((brand)=>{
+    arr.push(brand.value)
+  })
+  return arr
+}
+
+function getOccasions(occasions:string[]){
+  let arr=""
+  occasions.map((occasion)=>{
+    arr=arr.length?arr+","+occasion.value:arr+occasion.value
+  })
+  console.log(arr,"occasions")
+  return arr
+}
+export async function addProduct(product:InsertProducts) {
+  try{
+    const {colors,description,discount,gender,image_url,name,old_price,rating}=product
+    const price=product.old_price*((100-product.discount)/100).toFixed(2)
+    const brands=getBrandIds(product.brands)
+    const occasion=getOccasions(product.occasion)
+    const res= await db
+      .insertInto("products")
+      .values({
+        brands:JSON.stringify(brands)
+        ,colors
+        ,description
+        ,discount
+        ,gender
+        ,image_url
+        ,name
+        ,occasion
+        ,old_price
+        ,rating
+        ,price
+      })
+      .execute();
+      console.log(res[0].insertId)
+        for (const row of product.categories) {
+        await db.insertInto("product_categories")
+          .values({
+            category_id:row.value,
+            product_id:res[0].insertId
+          })
+          .execute();
+      }  
+  }catch(err){
+    throw err
+  }
+}
+export async function editProduct(product:InsertProducts,id:number) {
+  try{
+    const {categories}=product
+    let productObj={...product}
+    const price=productObj.old_price*((100-productObj.discount)/100).toFixed(2)
+    const brands=getBrandIds(productObj.brands)
+    const occasion=getOccasions(productObj.occasion)
+    
+    //remove categories and image url(if empty) from productObj 
+    delete productObj.categories
+    productObj=productObj.image_url==""?delete productObj.image_url:productObj
+    
+    /* console.log({
+      ...productObj,  
+      brands:JSON.stringify(brands),
+      occasion,
+      price
+    },"product obj",categories)
+     */
+    //delete product categories in product_categories
+    await db.deleteFrom("product_categories").where("product_id","=",id).execute()
+
+    //update values in products table
+    await db.updateTable("products")
+    .set({
+      ...productObj,  
+      brands:JSON.stringify(brands),
+      occasion,
+      price
+    })
+    .where("id","=",id)
+    .execute()
+
+    //add new categories to product_categories
+    for (const row of categories) {
+      await db.insertInto("product_categories")
+        .values({
+          category_id:row.value,
+          product_id:id
+        })
+        .execute();
+    }  
+
+  }catch(err){
+    throw err
   }
 }

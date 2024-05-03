@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { occasionOptions } from "../../../../constant";
 import Select from "react-select";
+import { addProduct } from "@/actions/productActions";
+import { toast } from "react-toastify";
 
 function AddProduct() {
   const [brandsOption, setBrandsOption] = useState([]);
@@ -42,7 +44,15 @@ function AddProduct() {
     validationSchema: basicSchema,
 
     onSubmit: async (values: any, actions) => {
-      alert("Please Update the Code");
+      try{
+        console.log(values)
+        await addProduct(values)
+        toast.success("Product added Successfully")
+        resetForm()
+      }catch(err){
+        toast.error("Add product failed")
+        throw err
+      }
     },
   });
 

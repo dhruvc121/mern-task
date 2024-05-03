@@ -31,7 +31,8 @@ function PaginationSection({
         name="page-size"
         className="text-black"
         onChange={(e) => {
-          alert("Please update the code.");
+          searchParams.set("pageSize",e.target.value)
+          router.push('/products')
         }}
       >
         {["10", "25", "50"].map((val) => {

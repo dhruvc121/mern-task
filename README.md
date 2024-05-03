@@ -12,7 +12,7 @@ To set up the project locally, follow these steps:
 
 1. Clone the repository and navigate to the project folder.
 2. Import the product_database.sql file in to your MySQL database (you can use phpMyAdmin).
-3. Create a .env.local file in your project directory with your own MySQL credentials as shown below.
+3. Create a .env.local file in your project directory with your own MySQL credentials as shown below.    <br>
     DB_NAME=your_db_name    <br>
     HOST=your_mysql_host_name    <br>
     USER_NAME=your_mysql_username    <br>

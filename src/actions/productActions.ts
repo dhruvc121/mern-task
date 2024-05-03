@@ -23,9 +23,11 @@ export async function getProducts(pageNo:number,pageSize:number,searchParams:any
       dbQuery=dbQuery.orderBy(sort[0], sort[1]=="asc"?"asc":"desc")
     } 
     if(brandId){
+      //to do
       dbQuery=dbQuery
     }
     if(categoryId){
+      //to do
       dbQuery=dbQuery
     }
     if(priceRangeTo){

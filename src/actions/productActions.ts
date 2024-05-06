@@ -28,7 +28,13 @@ export async function getProducts(pageNo:number,pageSize:number,searchParams:any
     }
     if(categoryId){
       //to do
-      dbQuery=dbQuery
+      const catArr=categoryId.split(',')
+      console.log(catArr)
+      const productIdArr=await db.selectFrom("product_categories").select('product_id')
+      .where('category_id', 'in', catArr)
+      .execute()
+      const productList=productIdArr.map((productId)=>{return productId.product_id})                  
+      dbQuery=dbQuery.where("id","in",productList)
     }
     if(priceRangeTo){
       dbQuery=dbQuery.where('price',"<=",priceRangeTo)
@@ -37,7 +43,6 @@ export async function getProducts(pageNo:number,pageSize:number,searchParams:any
       dbQuery=dbQuery.where('gender',"=",gender)
     }
     if(occasions){
-  
       dbQuery=dbQuery.where('occasion',"like",occasions)
     }
     if(discount){

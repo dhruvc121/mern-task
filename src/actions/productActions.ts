@@ -27,9 +27,7 @@ export async function getProducts(pageNo:number,pageSize:number,searchParams:any
       dbQuery=dbQuery
     }
     if(categoryId){
-      //to do
       const catArr=categoryId.split(',')
-      console.log(catArr)
       const productIdArr=await db.selectFrom("product_categories").select('product_id')
       .where('category_id', 'in', catArr)
       .execute()
@@ -51,15 +49,14 @@ export async function getProducts(pageNo:number,pageSize:number,searchParams:any
       dbQuery=dbQuery.where('discount',"<=",discPart[1])
     }  
     
+    const count=(await dbQuery.distinct().execute()).length
+
     products = await dbQuery
        .distinct()
        .offset((pageNo - 1) * pageSize)
        .limit(pageSize)
        .execute();
 
-    const {count} = await db.selectFrom("products").select(db.fn.count("products.id").as("count")).executeTakeFirst()
-       
-    
     const lastPage = Math.ceil(count / pageSize);
     
     const numOfResultsOnCurPage = products.length;
